@@ -2,7 +2,7 @@ import { Link, Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
-import ThemedTextType from "@/enums/themed-text-enum";
+import ThemedTextType from "@/enums/ThemedTextEnum";
 import { ThemedView } from '@/components/ThemedView';
 
 export default function NotFoundScreen() {

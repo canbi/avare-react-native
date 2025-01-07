@@ -1,9 +1,8 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
-import ThemedTextType from "@/enums/themed-text-enum";
+import ThemedTextType from "@/enums/ThemedTextEnum";
 import { ThemedView } from '@/components/ThemedView';
 import { Assets } from '@/constants/Assets';
 
@@ -19,7 +18,6 @@ export default function HomeScreen() {
       }>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type={ThemedTextType.title}>Welcome!</ThemedText>
-        <HelloWave />
       </ThemedView>
       <ThemedText>This app includes example code to help you get started.</ThemedText>
     </ParallaxScrollView>

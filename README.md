@@ -1,7 +1,8 @@
 # Avare React Native 👋
 
 ## Roadmap
-- [ ] Asset abstraction
+- [x] Asset abstraction
+- [x] Removing unused components
 - [ ] Localization setup
 - [ ] Flavor setup
 - [ ] 
