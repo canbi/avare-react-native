@@ -2,6 +2,7 @@ import { Text, type TextProps } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 import ThemedTextType, { getTextThemeStyle } from "@/enums/ThemedTextEnum";
+import { AppColors } from "@/constants/Colors";
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
@@ -10,7 +11,9 @@ export type ThemedTextProps = TextProps & {
 };
 
 export function ThemedText({ style, lightColor, darkColor, type = ThemedTextType.default, ...rest }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-
+  const color = useThemeColor({
+    light: lightColor || AppColors.default.text.light,
+    dark: darkColor || AppColors.default.text.dark,
+  });
   return <Text style={[{ color }, getTextThemeStyle(type), style]} {...rest} />;
 }
