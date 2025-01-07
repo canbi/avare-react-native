@@ -4,8 +4,8 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import ThemedTextType from "@/enums/ThemedTextEnum";
 import { ThemedView } from '@/components/ThemedView';
-import { Assets } from '@/constants/Assets';
-import { AppColors } from '@/constants/Colors';
+import { AppAssets } from '@/constants/AppAssets';
+import { AppColors } from '@/constants/AppColors';
 
 export default function HomeScreen() {
   return (
@@ -13,7 +13,7 @@ export default function HomeScreen() {
       headerBackgroundColor={AppColors.home.header}
       headerImage={
         <Image
-          source={Assets.images.home.header}
+          source={AppAssets.images.home.header}
           style={styles.reactLogo}
         />
       }>

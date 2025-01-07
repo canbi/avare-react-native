@@ -5,7 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { Assets } from "@/constants/Assets";
+import { AppAssets } from "@/constants/AppAssets";
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -15,7 +15,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: Assets.fonts.spaceMono.regular,
+    SpaceMono: AppAssets.fonts.spaceMono.regular,
   });
 
   useEffect(() => {

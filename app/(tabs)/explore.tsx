@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import ThemedTextType from "@/enums/ThemedTextEnum";
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { AppColors } from '@/constants/Colors';
+import { AppColors } from '@/constants/AppColors';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function TabTwoScreen() {
