@@ -6,11 +6,12 @@ import ThemedTextType from "@/enums/ThemedTextEnum";
 import { ThemedView } from '@/components/ThemedView';
 import { AppAssets } from '@/constants/AppAssets';
 import { AppColors } from '@/constants/AppColors';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function HomeScreen() {
   return (
     <ParallaxScrollView
-      headerBackgroundColor={AppColors.home.header}
+    headerBackgroundColor={useThemeColor(AppColors.home.header)}
       headerImage={
         <Image
           source={AppAssets.images.home.header}

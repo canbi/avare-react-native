@@ -9,9 +9,10 @@ import { AppColors } from '@/constants/AppColors';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function TabTwoScreen() {
+  
   return (
     <ParallaxScrollView
-      headerBackgroundColor={AppColors.explore.header}
+      headerBackgroundColor={useThemeColor(AppColors.explore.header)}
       headerImage={
         <IconSymbol
           size={310}
