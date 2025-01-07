@@ -7,10 +7,10 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { AppColors } from '@/constants/AppColors';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { getTranslation, TranslationKeys } from '@/i18n/translation-keys';
-import { Link } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function TabTwoScreen() {
+  const { t } = useTranslation();
   
   return (
     <ParallaxScrollView
@@ -24,7 +24,7 @@ export default function TabTwoScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type={ThemedTextType.title}>{getTranslation(TranslationKeys.EXPLORE_TITLE)}</ThemedText>
+        <ThemedText type={ThemedTextType.title}>{t('explore_title')}</ThemedText>
       </ThemedView>
     </ParallaxScrollView>
   );

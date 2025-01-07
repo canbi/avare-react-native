@@ -7,9 +7,11 @@ import { ThemedView } from '@/components/ThemedView';
 import { AppAssets } from '@/constants/AppAssets';
 import { AppColors } from '@/constants/AppColors';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { getTranslation, TranslationKeys } from '@/i18n/translation-keys';
+import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
+
   return (
     <ParallaxScrollView
     headerBackgroundColor={useThemeColor(AppColors.home.header)}
@@ -20,7 +22,7 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type={ThemedTextType.title}>{getTranslation(TranslationKeys.HOME_TITLE)}</ThemedText>
+        <ThemedText type={ThemedTextType.title}>{t('home_title')}</ThemedText>
       </ThemedView>
     </ParallaxScrollView>
   );

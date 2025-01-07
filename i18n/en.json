@@ -1,13 +1,11 @@
 {
-  "translation": {
-    "home_tab_title": "Home",
-    "home_title": "Welcome",
-    "explore_title": "Explore",
-    "bottom_nav_home": "Home",
-    "bottom_nav_explore": "Explore",
-    "not_found_title": "Page Not Found",
-    "not_found_description": "We couldn't find the page you're looking for.",
-    "not_found_go_home": "Go to Home"
-  }
+  "home_tab_title": "Home",
+  "home_title": "Welcome",
+  "explore_title": "Explore",
+  "bottom_nav_home": "Home",
+  "bottom_nav_explore": "Explore",
+  "not_found_title": "Page Not Found",
+  "not_found_description": "We couldn't find the page you're looking for.",
+  "not_found_go_home": "Go to Home"
 }
 
