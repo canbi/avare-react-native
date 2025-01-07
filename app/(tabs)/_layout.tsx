@@ -7,6 +7,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { AppColors } from '@/constants/AppColors';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { getTranslation, TranslationKeys } from '@/i18n/translation-keys';
 
 export default function TabLayout() {
   return (
@@ -27,14 +28,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: getTranslation(TranslationKeys.BOTTOM_NAV_HOME),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
+          title: getTranslation(TranslationKeys.BOTTOM_NAV_EXPLORE),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />

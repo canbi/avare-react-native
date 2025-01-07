@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { AppAssets } from '@/constants/AppAssets';
 import { AppColors } from '@/constants/AppColors';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { getTranslation, TranslationKeys } from '@/i18n/translation-keys';
 
 export default function HomeScreen() {
   return (
@@ -19,9 +20,8 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type={ThemedTextType.title}>Welcome!</ThemedText>
+        <ThemedText type={ThemedTextType.title}>{getTranslation(TranslationKeys.HOME_TITLE)}</ThemedText>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
     </ParallaxScrollView>
   );
 }

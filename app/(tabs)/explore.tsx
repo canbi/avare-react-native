@@ -7,6 +7,8 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { AppColors } from '@/constants/AppColors';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { getTranslation, TranslationKeys } from '@/i18n/translation-keys';
+import { Link } from 'expo-router';
 
 export default function TabTwoScreen() {
   
@@ -22,9 +24,8 @@ export default function TabTwoScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type={ThemedTextType.title}>Explore</ThemedText>
+        <ThemedText type={ThemedTextType.title}>{getTranslation(TranslationKeys.EXPLORE_TITLE)}</ThemedText>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
     </ParallaxScrollView>
   );
 }

@@ -4,6 +4,6 @@
 - [x] Asset abstraction
 - [x] Removing unused components
 - [x] Color abstraction
-- [ ] Localization setup
+- [x] Localization setup
 - [ ] Flavor setup
 - [ ] 
