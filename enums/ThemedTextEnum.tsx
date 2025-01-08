@@ -1,5 +1,4 @@
 import { AppColors } from "@/constants/AppColors";
-import { useThemeColor } from "@/hooks/useThemeColor";
 import { StyleSheet } from "react-native";
 
 enum ThemedTextType {

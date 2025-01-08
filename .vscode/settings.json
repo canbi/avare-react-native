@@ -14,4 +14,6 @@
         "tree.indentGuidesStroke": "#008070"
     },
     "debug.toolBarLocation": "commandCenter",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
 }
