@@ -1,9 +1,7 @@
-import { Button, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { forwardRef, useCallback, useMemo } from "react";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  useBottomSheet,
-} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import AppBottomSheetCloseButton from "./AppBottomSheetCloseButton";
 export type Ref = BottomSheet;
 
 interface Props {
@@ -15,11 +13,6 @@ interface Props {
   backdropPressBehavior?: number | "none" | "close" | "collapse";
   children: React.ReactNode;
 }
-
-const CloseBtn = () => {
-  const { close } = useBottomSheet();
-  return <Button title="Close" onPress={() => close()} />;
-};
 
 const AppBottomSheet = forwardRef<Ref, Props>((props, ref) => {
   const {
@@ -59,7 +52,7 @@ const AppBottomSheet = forwardRef<Ref, Props>((props, ref) => {
         {children}
         {showCloseButton && (
           <View style={styles.closeButtonContainer}>
-            <CloseBtn />
+            <AppBottomSheetCloseButton />
           </View>
         )}
       </View>
