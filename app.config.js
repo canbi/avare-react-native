@@ -28,6 +28,13 @@ export default {
     favicon: "./assets/images/favicon.png",
   },
   plugins: [
+    [
+      "expo-sqlite",
+      {
+        enableFTS: true,
+        useSQLCipher: true,
+      },
+    ],
     "expo-router",
     [
       "expo-splash-screen",

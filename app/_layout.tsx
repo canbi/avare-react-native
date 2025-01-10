@@ -16,10 +16,10 @@ import i18n from "@/i18n/i18n";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { initDatabase } from "@/repository/databaseRepository";
 
 SplashScreen.preventAutoHideAsync();
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const initI18n = i18n;
 
 export default function RootLayout() {
@@ -27,7 +27,13 @@ export default function RootLayout() {
   const [loaded] = useFonts({ SpaceMono: AppAssets.fonts.spaceMono.regular });
 
   useEffect(() => {
-    if (loaded) SplashScreen.hideAsync();
+    const initializeApp = async () => {
+      await initDatabase();
+
+      if (loaded) await SplashScreen.hideAsync();
+    };
+
+    initializeApp();
   }, [loaded]);
 
   if (!loaded) return null;
