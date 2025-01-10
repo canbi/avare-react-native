@@ -1,13 +1,10 @@
 {
-  "translation": {
-    "home_tab_title": "Anasayfa",
-    "home_title": "Hoş Geldin",
-    "explore_title": "Keşfet",
-    "bottom_nav_home": "Anasayfa",
-    "bottom_nav_explore": "Keşfet",
-    "not_found_title": "Sayfa Bulunamadı",
-    "not_found_description": "Aradığınız sayfayı bulamadık.",
-    "not_found_go_home": "Anasayfaya Git"
-  }
+  "home_tab_title": "Anasayfa",
+  "home_title": "Hoş Geldin",
+  "explore_title": "Keşfet",
+  "bottom_nav_home": "Anasayfa",
+  "bottom_nav_explore": "Keşfet",
+  "not_found_title": "Sayfa Bulunamadı",
+  "not_found_description": "Aradığınız sayfayı bulamadık.",
+  "not_found_go_home": "Anasayfaya Git"
 }
-
