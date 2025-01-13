@@ -61,19 +61,17 @@ const addNotesToLocation = async (
 ): Promise<void> => {
   const db = await getDatabase();
 
-  await db.withTransactionAsync(async () => {
-    const promises = notes.map((note) =>
-      db.runAsync(
-        "INSERT INTO note (description, date, write_date, location_id) VALUES (?, ?, ?, ?)",
-        note.description,
-        note.date,
-        note.write_date,
-        locationId
-      )
-    );
+  const promises = notes.map((note) =>
+    db.runAsync(
+      "INSERT INTO note (description, date, write_date, location_id) VALUES (?, ?, ?, ?)",
+      note.description,
+      note.date,
+      note.write_date,
+      locationId
+    )
+  );
 
-    await Promise.all(promises);
-  });
+  await Promise.all(promises);
 };
 
 const removeAllNotesFromLocation = async (
@@ -81,9 +79,7 @@ const removeAllNotesFromLocation = async (
 ): Promise<void> => {
   const db = await getDatabase();
 
-  await db.withTransactionAsync(async () => {
-    await db.runAsync("DELETE FROM note WHERE location_id = ?", locationId);
-  });
+  await db.runAsync("DELETE FROM note WHERE location_id = ?", locationId);
 };
 
 const getNotesForLocation = async (locationId: number): Promise<Note[]> => {

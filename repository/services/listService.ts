@@ -91,24 +91,20 @@ const addLocationsToList = async (
 ): Promise<void> => {
   const db = await getDatabase();
 
-  await db.withTransactionAsync(async () => {
-    const promises = locationIds.map((locationId) =>
-      db.runAsync(
-        "INSERT INTO list_location (list_id, location_id) VALUES (?, ?)",
-        listId,
-        locationId
-      )
-    );
-    await Promise.all(promises);
-  });
+  const promises = locationIds.map((locationId) =>
+    db.runAsync(
+      "INSERT INTO list_location (list_id, location_id) VALUES (?, ?)",
+      listId,
+      locationId
+    )
+  );
+  await Promise.all(promises);
 };
 
 const removeAllLocationsFromList = async (listId: number): Promise<void> => {
   const db = await getDatabase();
 
-  await db.withTransactionAsync(async () => {
-    await db.runAsync("DELETE FROM list_location WHERE list_id = ?", listId);
-  });
+  await db.runAsync("DELETE FROM list_location WHERE list_id = ?", listId);
 };
 
 const getLocationsForList = async (listId: number): Promise<Location[]> => {
