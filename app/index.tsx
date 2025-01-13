@@ -5,7 +5,7 @@ import { createListWithLocations } from "@/repository/services/listService";
 import { createLocationWithListsAndNotes } from "@/repository/services/locationService";
 import { List, Location, Note } from "@/repository/domain";
 import LocationsSheetBody from "@/views/location-sheet";
-import { deleteAndRecreateDatabase } from "@/repository/databaseRepository";
+import { deleteAndRecreateDatabase } from "@/repository/database/databaseRepository";
 import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 

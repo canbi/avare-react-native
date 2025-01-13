@@ -1,4 +1,4 @@
-import { getDatabase } from "../databaseRepository";
+import { getDatabase } from "../database/databaseRepository";
 import { List } from "../domain/list";
 import { Note } from "../domain/note";
 import { Location } from "../domain/location";

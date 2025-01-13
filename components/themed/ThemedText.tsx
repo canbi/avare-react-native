@@ -10,7 +10,13 @@ export type ThemedTextProps = TextProps & {
   type?: ThemedTextType;
 };
 
-export function ThemedText({ style, lightColor, darkColor, type = ThemedTextType.default, ...rest }: ThemedTextProps) {
+export function ThemedText({
+  style,
+  lightColor,
+  darkColor,
+  type = ThemedTextType.default,
+  ...rest
+}: ThemedTextProps) {
   const color = useThemeColor({
     light: lightColor || AppColors.default.text.light,
     dark: darkColor || AppColors.default.text.dark,
