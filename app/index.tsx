@@ -1,17 +1,16 @@
-import React, { useRef } from "react";
-import { View, StyleSheet, Text, Button, TouchableOpacity } from "react-native";
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { IconSymbol } from "@/components/icon/IconSymbol";
+import React from "react";
+import { View, StyleSheet, Text, Button } from "react-native";
 import AppBottomSheet from "@/components/sheet/AppBottomSheet";
 import { createListWithLocations } from "@/repository/services/listService";
 import { createLocationWithListsAndNotes } from "@/repository/services/locationService";
 import { List, Location, Note } from "@/repository/domain";
 import LocationsSheetBody from "@/views/location-sheet";
-import { deleteAndRecreateDatabase } from "@/repository/databaseRepository"; // Import the new function
+import { deleteAndRecreateDatabase } from "@/repository/databaseRepository";
+import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 export default function HomeScreen() {
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const profileSheetRef = useRef<BottomSheet>(null);
+  const { bottomSheetRef, profileSheetRef } = useBottomSheetContext();
 
   const handleCreateDummyList = async () => {
     try {
@@ -95,24 +94,7 @@ export default function HomeScreen() {
         showCloseButton={false}
         canDragToClose={false}
       >
-        <BottomSheetScrollView style={styles.contentContainer}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Main Sheet</Text>
-            <TouchableOpacity
-              onPress={() => {
-                bottomSheetRef.current?.snapToIndex(0);
-                profileSheetRef.current?.snapToIndex(1);
-              }}
-            >
-              <IconSymbol
-                size={28}
-                name="person.crop.circle.fill"
-                color="#000"
-              />
-            </TouchableOpacity>
-          </View>
-          <LocationsSheetBody />
-        </BottomSheetScrollView>
+        <LocationsSheetBody />
       </AppBottomSheet>
 
       <AppBottomSheet ref={profileSheetRef} initialPosition={-1}>
