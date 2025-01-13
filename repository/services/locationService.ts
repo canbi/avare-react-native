@@ -78,15 +78,19 @@ const createLocationWithListsAndNotes = async (
   location: Omit<Location, "id">,
   listIds: number[],
   notes: Omit<Note, "id">[]
-): Promise<void> => {
+): Promise<number> => {
   const db = await getDatabase();
+
+  let locationId: number;
 
   await db.withTransactionAsync(async () => {
     const locationResult = await createLocation(location);
-    const locationId = locationResult.lastInsertRowId;
+    locationId = locationResult.lastInsertRowId as number;
     await addListsToLocation(locationId, listIds);
     await addNotesToLocation(locationId, notes);
   });
+
+  return locationId!;
 };
 
 const updateLocationWithListsAndNotes = async (

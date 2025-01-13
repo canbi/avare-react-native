@@ -19,31 +19,17 @@ const getNoteById = async (id: number): Promise<Note | null> => {
 };
 
 const createNote = async (
-  note: Omit<Note, "id">
+  note: Omit<Note, "id">,
+  location_id: number
 ): Promise<SQLite.SQLiteRunResult> => {
   const db = await getDatabase();
+
   const result = await db.runAsync(
     "INSERT INTO note (description, date, write_date, location_id) VALUES (?, ?, ?, ?)",
     note.description,
     note.date,
     note.write_date,
-    note.location_id
-  );
-  return result;
-};
-
-const updateNote = async (
-  id: number,
-  note: Note
-): Promise<SQLite.SQLiteRunResult> => {
-  const db = await getDatabase();
-  const result = await db.runAsync(
-    "UPDATE note SET description = ?, date = ?, write_date = ?, location_id = ? WHERE id = ?",
-    note.description,
-    note.date,
-    note.write_date,
-    note.location_id,
-    id
+    location_id
   );
   return result;
 };
@@ -59,18 +45,7 @@ const addNotesToLocation = async (
   locationId: number,
   notes: Omit<Note, "id">[]
 ): Promise<void> => {
-  const db = await getDatabase();
-
-  const promises = notes.map((note) =>
-    db.runAsync(
-      "INSERT INTO note (description, date, write_date, location_id) VALUES (?, ?, ?, ?)",
-      note.description,
-      note.date,
-      note.write_date,
-      locationId
-    )
-  );
-
+  const promises = notes.map((note) => createNote(note, locationId));
   await Promise.all(promises);
 };
 

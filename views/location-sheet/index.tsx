@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { getLocations } from "@/repository/services/locationService";
-import { Location } from "@/repository/domain";
+import { getLists } from "@/repository/services/listService";
+import { Location, List } from "@/repository/domain";
 import * as SQLite from "expo-sqlite";
 import { IconSymbol } from "@/components/icon/IconSymbol";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
+import LocationItem from "./locationItem";
+import ListItem from "./listItem";
 
 const LocationsSheetBody = () => {
   const { bottomSheetRef, profileSheetRef } = useBottomSheetContext();
   const [locations, setLocations] = useState<Location[]>([]);
+  const [lists, setLists] = useState<List[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchLocations = async () => {
@@ -24,12 +34,26 @@ const LocationsSheetBody = () => {
     }
   };
 
+  const fetchLists = async () => {
+    setIsRefreshing(true);
+    try {
+      const fetchedLists = await getLists();
+      setLists(fetchedLists);
+    } catch (error) {
+      console.error("Failed to fetch lists:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   useEffect(() => {
     const initialize = async () => {
       await fetchLocations();
+      await fetchLists();
 
       const subscription = SQLite.addDatabaseChangeListener(() => {
         fetchLocations();
+        fetchLists();
       });
 
       return () => {
@@ -39,6 +63,14 @@ const LocationsSheetBody = () => {
 
     initialize();
   }, []);
+
+  const renderLocationItem = ({ item }: { item: Location }) => (
+    <LocationItem key={item.id} location={item} />
+  );
+
+  const renderListItem = ({ item }: { item: List }) => (
+    <ListItem key={item.id} list={item} />
+  );
 
   return (
     <BottomSheetScrollView style={styles.contentContainer}>
@@ -54,6 +86,25 @@ const LocationsSheetBody = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.container}>
+        {/* Lists Section */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Lists</Text>
+          <TouchableOpacity onPress={fetchLists} disabled={isRefreshing}>
+            <Text style={styles.reloadButton}>
+              {isRefreshing ? "Refreshing..." : "Reload"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <FlatList
+          data={lists}
+          renderItem={renderListItem}
+          keyExtractor={(item) => item.id!.toString()}
+          scrollEnabled={false}
+        />
+
+        <View style={{ height: 16 }} />
+
+        {/* Locations Section */}
         <View style={styles.header}>
           <Text style={styles.title}>Locations</Text>
           <TouchableOpacity onPress={fetchLocations} disabled={isRefreshing}>
@@ -62,11 +113,12 @@ const LocationsSheetBody = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        {locations.map((location) => (
-          <Text key={location.id} style={styles.locationItem}>
-            {location.title}
-          </Text>
-        ))}
+        <FlatList
+          data={locations}
+          renderItem={renderLocationItem}
+          keyExtractor={(item) => item.id!.toString()}
+          scrollEnabled={false}
+        />
       </View>
     </BottomSheetScrollView>
   );

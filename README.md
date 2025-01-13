@@ -7,7 +7,7 @@
 - [x] Color abstraction
 - [x] Localization setup
 - [x] Bottom Sheet Components
-- [ ] Local Database
+- [x] Local Database
 - [ ] Google Map
 - [ ] Add/Edit Location Sheet
 - [ ] Google Map Annotation

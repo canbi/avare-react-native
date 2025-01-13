@@ -1,5 +1,6 @@
 import { getDatabase } from "../database/databaseRepository";
 import { List } from "../domain/list";
+import { Location } from "../domain/location";
 import * as SQLite from "expo-sqlite";
 
 // * CRUD
@@ -58,14 +59,18 @@ const deleteList = async (id: number): Promise<SQLite.SQLiteRunResult> => {
 const createListWithLocations = async (
   list: Omit<List, "id">,
   locationIds: number[]
-): Promise<void> => {
+): Promise<number> => {
   const db = await getDatabase();
+
+  let listId: number;
 
   await db.withTransactionAsync(async () => {
     const createListResult = await createList(list);
-    const listId = createListResult.lastInsertRowId;
+    listId = createListResult.lastInsertRowId as number;
     await addLocationsToList(listId, locationIds);
   });
+
+  return listId!;
 };
 
 const updateListWithLocations = async (
