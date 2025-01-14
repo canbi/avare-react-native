@@ -16,7 +16,7 @@ interface Props {
 
 const AppBottomSheet = forwardRef<Ref, Props>((props, ref) => {
   const {
-    snapPoints = ["25%", "50%", "90%"],
+    snapPoints = ["16%", "50%", "90%"],
     initialPosition = 1,
     canDragToClose = true,
     showCloseButton = true,

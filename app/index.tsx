@@ -1,96 +1,147 @@
-import React from "react";
-import { View, StyleSheet, Text, Button } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Platform,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import AppBottomSheet from "@/components/sheet/AppBottomSheet";
-import { createListWithLocations } from "@/repository/services/listService";
-import { createLocationWithListsAndNotes } from "@/repository/services/locationService";
-import { List, Location, Note } from "@/repository/domain";
 import LocationsSheetBody from "@/views/location-sheet";
-import { deleteAndRecreateDatabase } from "@/repository/database/databaseRepository";
 import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import ProfileSheetBody from "@/views/profile-sheet";
+import MapView, { MapType, Marker } from "react-native-maps";
+import * as Location from "expo-location";
+import { MenuView } from "@react-native-menu/menu";
 
 export default function HomeScreen() {
   const { bottomSheetRef, profileSheetRef } = useBottomSheetContext();
+  const [mapType, setMapType] = useState<MapType>("standard");
+  const [showMenu, setShowMenu] = useState(false);
 
-  const handleCreateDummyNote = async (): Promise<Omit<Note, "id">> => {
-    const note: Omit<Note, "id"> = {
-      description: "This is a dummy note",
-      date: new Date().toISOString(),
-      write_date: new Date().toISOString(),
-    };
-    return note;
-  };
-
-  const handleCreateDummyLocation = async (): Promise<Location> => {
-    const location: Omit<Location, "id"> = {
-      latitude: 37.7749,
-      longitude: -122.4194,
-      title: "Dummy Location",
-      description: "This is a dummy location",
-      emoji: "📍",
-      color: "#FF0000",
-      is_cover_empty: false,
-      country: "USA",
-      country_code: "US",
-      local_address: "San Francisco, CA",
-      write_date: new Date().toISOString(),
-      photo_ids: "",
+  useEffect(() => {
+    const requestLocationPermission = async () => {
+      await Location.requestForegroundPermissionsAsync();
     };
 
-    const notes: Omit<Note, "id">[] = [];
-    for (let i = 0; i < 3; i++) {
-      const note = await handleCreateDummyNote();
-      notes.push(note);
-    }
+    requestLocationPermission();
+  }, []);
 
-    const locationId = await createLocationWithListsAndNotes(
-      location,
-      [],
-      notes
-    );
-    return { ...location, id: locationId };
+  const initialRegion = {
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
   };
 
-  const handleCreateDummyList = async () => {
-    try {
-      const list: Omit<List, "id"> = {
-        title: "Dummy List",
-        description: "This is a dummy list",
-        emoji: "📝",
-        write_date: new Date().toISOString(),
-      };
+  const markers = [
+    {
+      id: 1,
+      coordinate: { latitude: 37.78825, longitude: -122.4324 },
+      title: "Marker 1",
+      description: "This is marker 1",
+      //icon: "place",
+    },
+    {
+      id: 2,
+      coordinate: { latitude: 37.78925, longitude: -122.4334 },
+      title: "Marker 2",
+      description: "This is marker 2",
+      //icon: "location-on",
+    },
+  ];
 
-      const locations: number[] = [];
-      for (let i = 0; i < 2; i++) {
-        const location = await handleCreateDummyLocation();
-        locations.push(location.id!);
-      }
-
-      await createListWithLocations(list, locations);
-      console.log("Dummy list, locations, and notes created successfully!");
-    } catch (error) {
-      console.error("Error creating dummy list:", error);
-    }
-  };
-
-  const handleDeleteAndRecreateDatabase = async () => {
-    try {
-      await deleteAndRecreateDatabase();
-      console.log("Database deleted and recreated successfully");
-    } catch (error) {
-      console.error("Error deleting and recreating database:", error);
-    }
+  const handleMapTypeChange = (type: MapType) => {
+    setMapType(type);
   };
 
   return (
     <View style={[StyleSheet.absoluteFill, styles.container]}>
-      <Text>Home Screen</Text>
+      <MapView
+        style={styles.map}
+        initialRegion={initialRegion}
+        showsUserLocation={true}
+        mapType={mapType}
+      >
+        {markers.map((marker) => (
+          <Marker
+            key={marker.id}
+            coordinate={marker.coordinate}
+            title={marker.title}
+            description={marker.description}
+          ></Marker>
+        ))}
+      </MapView>
 
-      <Button title="Create Dummy List" onPress={handleCreateDummyList} />
-      <Button
-        title="Delete and Recreate Database"
-        onPress={handleDeleteAndRecreateDatabase}
-      />
+      {/* <View style={styles.mapMenuButtonContainer}>
+        <BlurView style={styles.materialBackground} intensity={60}>
+          <TouchableOpacity
+            style={styles.mapMenuButtonTop}
+            onPress={() => setShowMenu(!showMenu)}
+          >
+            <MaterialIcons name="map" size={24} color="white" />
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity
+            style={styles.mapMenuButtonBottom}
+            onPress={() => setShowMenu(!showMenu)}
+          >
+            <MaterialIcons name="map" size={24} color="white" />
+          </TouchableOpacity>
+        </BlurView>
+      </View> */}
+
+      <MenuView
+        style={styles.menu}
+        title="Menu Title"
+        onPressAction={({ nativeEvent }) => {
+          console.warn(JSON.stringify(nativeEvent));
+        }}
+        actions={[
+          {
+            id: "share",
+            title: "Share Action",
+            titleColor: "#46F289",
+            subtitle: "Share action on SNS",
+            image: Platform.select({
+              ios: "square.and.arrow.up",
+              android: "ic_menu_share",
+            }),
+            imageColor: "#46F289",
+            state: "on",
+          },
+        ]}
+        shouldOpenOnLongPress={false}
+      >
+        <View>
+          <Text>Menu Contentasdasdasdasdasda</Text>
+        </View>
+      </MenuView>
+
+      {/* {showMenu && (
+        <View style={styles.menu}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleMapTypeChange("standard")}
+          >
+            <Text style={styles.menuText}>Standard</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleMapTypeChange("satellite")}
+          >
+            <Text style={styles.menuText}>Satellite</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleMapTypeChange("hybrid")}
+          >
+            <Text style={styles.menuText}>Hybrid</Text>
+          </TouchableOpacity>
+        </View>
+      )} */}
 
       <AppBottomSheet
         ref={bottomSheetRef}
@@ -100,13 +151,12 @@ export default function HomeScreen() {
         <LocationsSheetBody />
       </AppBottomSheet>
 
-      <AppBottomSheet ref={profileSheetRef} initialPosition={-1}>
-        <BottomSheetScrollView style={styles.contentContainer}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Profile Sheet</Text>
-          </View>
-          <Text>Awesome 🎉</Text>
-        </BottomSheetScrollView>
+      <AppBottomSheet
+        ref={profileSheetRef}
+        initialPosition={-1}
+        snapPoints={["50%", "90%"]}
+      >
+        <ProfileSheetBody />
       </AppBottomSheet>
     </View>
   );
@@ -117,22 +167,53 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
   },
-  contentContainer: {
-    flex: 1,
-    padding: 16,
+  map: {
+    width: "100%",
+    height: "100%",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  mapMenuButtonContainer: {
+    position: "absolute",
+    top: 40,
+    right: 10,
     alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+  materialBackground: {
+    width: 60,
+    height: 120,
+    borderRadius: 30,
+    overflow: "hidden",
+    elevation: 5,
+  },
+  mapMenuButtonTop: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  mapMenuButtonBottom: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  divider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+  },
+  menu: {
+    position: "absolute",
+    top: 180,
+    right: 10,
+    backgroundColor: "#333",
+    borderRadius: 10,
+    padding: 10,
+    elevation: 5,
+  },
+  menuItem: {
+    padding: 10,
+  },
+  menuText: {
+    color: "white",
+    fontSize: 16,
   },
 });
