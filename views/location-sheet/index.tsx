@@ -5,16 +5,24 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Button,
 } from "react-native";
-import { getLocations } from "@/repository/services/locationService";
-import { getLists } from "@/repository/services/listService";
-import { Location, List } from "@/repository/domain";
+import {
+  createLocationWithListsAndNotes,
+  getLocations,
+} from "@/repository/services/locationService";
+import {
+  createListWithLocations,
+  getLists,
+} from "@/repository/services/listService";
+import { Location, List, Note } from "@/repository/domain";
 import * as SQLite from "expo-sqlite";
 import { IconSymbol } from "@/components/icon/IconSymbol";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
 import LocationItem from "./locationItem";
 import ListItem from "./listItem";
+import { deleteAndRecreateDatabase } from "@/repository/database/databaseRepository";
 
 const LocationsSheetBody = () => {
   const { bottomSheetRef, profileSheetRef } = useBottomSheetContext();
@@ -64,6 +72,77 @@ const LocationsSheetBody = () => {
     initialize();
   }, []);
 
+  // DUMMY STUFF
+  const handleCreateDummyNote = async (): Promise<Omit<Note, "id">> => {
+    const note: Omit<Note, "id"> = {
+      description: "This is a dummy note",
+      date: new Date().toISOString(),
+      write_date: new Date().toISOString(),
+    };
+    return note;
+  };
+
+  const handleCreateDummyLocation = async (): Promise<Location> => {
+    const location: Omit<Location, "id"> = {
+      latitude: 37.7749,
+      longitude: -122.4194,
+      title: "Dummy Location",
+      description: "This is a dummy location",
+      emoji: "📍",
+      color: "#FF0000",
+      is_cover_empty: false,
+      country: "USA",
+      country_code: "US",
+      local_address: "San Francisco, CA",
+      write_date: new Date().toISOString(),
+      photo_ids: "",
+    };
+
+    const notes: Omit<Note, "id">[] = [];
+    for (let i = 0; i < 3; i++) {
+      const note = await handleCreateDummyNote();
+      notes.push(note);
+    }
+
+    const locationId = await createLocationWithListsAndNotes(
+      location,
+      [],
+      notes
+    );
+    return { ...location, id: locationId };
+  };
+
+  const handleCreateDummyList = async () => {
+    try {
+      const list: Omit<List, "id"> = {
+        title: "Dummy List",
+        description: "This is a dummy list",
+        emoji: "📝",
+        write_date: new Date().toISOString(),
+      };
+
+      const locations: number[] = [];
+      for (let i = 0; i < 2; i++) {
+        const location = await handleCreateDummyLocation();
+        locations.push(location.id!);
+      }
+
+      await createListWithLocations(list, locations);
+      console.log("Dummy list, locations, and notes created successfully!");
+    } catch (error) {
+      console.error("Error creating dummy list:", error);
+    }
+  };
+
+  const handleDeleteAndRecreateDatabase = async () => {
+    try {
+      await deleteAndRecreateDatabase();
+      console.log("Database deleted and recreated successfully");
+    } catch (error) {
+      console.error("Error deleting and recreating database:", error);
+    }
+  };
+
   const renderLocationItem = ({ item }: { item: Location }) => (
     <LocationItem key={item.id} location={item} />
   );
@@ -85,6 +164,12 @@ const LocationsSheetBody = () => {
           <IconSymbol size={28} name="person.crop.circle.fill" color="#000" />
         </TouchableOpacity>
       </View>
+      <Button title="Create Dummy List" onPress={handleCreateDummyList} />
+      <Button
+        title="Delete and Recreate Database"
+        onPress={handleDeleteAndRecreateDatabase}
+      />
+
       <View style={styles.container}>
         {/* Lists Section */}
         <View style={styles.header}>

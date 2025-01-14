@@ -1,13 +1,14 @@
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const LocationsSheetBody = () => {
+const ProfileSheetBody = () => {
   return (
-    <View style={styles.container}>
+    <BottomSheetScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
       </View>
-    </View>
+    </BottomSheetScrollView>
   );
 };
 
@@ -28,4 +29,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationsSheetBody;
+export default ProfileSheetBody;

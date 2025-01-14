@@ -21,7 +21,7 @@ export default {
   icon: "./assets/images/icon.png",
   scheme: "myapp",
   userInterfaceStyle: "automatic",
-  newArchEnabled: true,
+  newArchEnabled: false,
   web: {
     bundler: "metro",
     output: "static",
@@ -43,6 +43,14 @@ export default {
         imageWidth: 200,
         resizeMode: "contain",
         backgroundColor: "#ffffff",
+      },
+    ],
+    [
+      "expo-location",
+      {
+        locationWhenInUsePermission:
+          "Allow $(PRODUCT_NAME) to use your location.",
+        isAndroidForegroundServiceEnabled: true,
       },
     ],
   ],
