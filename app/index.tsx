@@ -1,25 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Platform, Text } from "react-native";
-import AppBottomSheet from "@/components/sheet/AppBottomSheet";
-import LocationsSheetBody from "@/views/location-sheet";
-import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
-import ProfileSheetBody from "@/views/profile-sheet";
-import MapView, { MapType, Marker } from "react-native-maps";
-import * as Location from "expo-location";
-import { MenuView } from "@react-native-menu/menu";
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet } from 'react-native';
+import AppBottomSheet from '@/components/sheet/AppBottomSheet';
+import LocationsSheetBody from '@/views/location-sheet';
+import { useBottomSheetContext } from '@/contexts/BottomSheetContext';
+import ProfileSheetBody from '@/views/profile-sheet';
+import MapView, { MapType, Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
+import HomeMenu from '@/components/home/home_menu';
+import { centerOnCurrentLocation } from '@/utils/mapUtils';
 
 export default function HomeScreen() {
   const { bottomSheetRef, profileSheetRef } = useBottomSheetContext();
-  const [mapType, setMapType] = useState<MapType>("standard");
+  const [mapType, setMapType] = useState<MapType>('standard');
+  const [currentLocation, setCurrentLocation] = useState<Location.LocationObjectCoords>();
+  const [showPOI, setShowPOI] = useState(true);
+  const mapRef = useRef<MapView>(null);
 
-  useEffect(() => {
-    const requestLocationPermission = async () => {
-      await Location.requestForegroundPermissionsAsync();
-    };
-
-    requestLocationPermission();
-  }, []);
-
+  // TODO get from local
   const initialRegion = {
     latitude: 37.78825,
     longitude: -122.4324,
@@ -27,34 +24,35 @@ export default function HomeScreen() {
     longitudeDelta: 0.0421,
   };
 
+  // TODO get from local
   const markers = [
     {
       id: 1,
       coordinate: { latitude: 37.78825, longitude: -122.4324 },
-      title: "Marker 1",
-      description: "This is marker 1",
-      //icon: "place",
+      title: 'Marker 1',
+      description: 'This is marker 1',
     },
     {
       id: 2,
       coordinate: { latitude: 37.78925, longitude: -122.4334 },
-      title: "Marker 2",
-      description: "This is marker 2",
-      //icon: "location-on",
+      title: 'Marker 2',
+      description: 'This is marker 2',
     },
   ];
-
-  const handleMapTypeChange = (type: MapType) => {
-    setMapType(type);
-  };
 
   return (
     <View style={[StyleSheet.absoluteFill, styles.container]}>
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={initialRegion}
         showsUserLocation={true}
+        onUserLocationChange={(event) => {
+          const { coordinate } = event.nativeEvent;
+          if (coordinate) setCurrentLocation(event.nativeEvent.coordinate as Location.LocationObjectCoords);
+        }}
         mapType={mapType}
+        showsPointsOfInterest={showPOI}
       >
         {markers.map((marker) => (
           <Marker
@@ -62,85 +60,26 @@ export default function HomeScreen() {
             coordinate={marker.coordinate}
             title={marker.title}
             description={marker.description}
-          ></Marker>
+          />
         ))}
       </MapView>
 
-      <MenuView
-        style={styles.menu}
-        title="Menu Title"
-        onPressAction={({ nativeEvent }) => {
-          console.warn(JSON.stringify(nativeEvent));
+      <HomeMenu
+        currentMapType={mapType}
+        onMapTypeChange={(type) => setMapType(type)}
+        onCenterOnCurrentLocation={() => {
+          centerOnCurrentLocation(mapRef, setCurrentLocation, currentLocation);
+          bottomSheetRef?.current?.snapToIndex(0);
         }}
-        actions={[
-          {
-            id: "add",
-            title: "Add",
-            titleColor: "#2367A2",
-            image: Platform.select({
-              ios: "plus",
-              android: "ic_menu_add",
-            }),
-            imageColor: "#2367A2",
-            subactions: [
-              {
-                id: "nested1",
-                title: "Nested action",
-                titleColor: "rgba(250,180,100,0.5)",
-                subtitle: "State is mixed",
-                image: Platform.select({
-                  ios: "heart.fill",
-                  android: "ic_menu_today",
-                }),
-                imageColor: "rgba(100,200,250,0.3)",
-                state: "mixed",
-              },
-              {
-                id: "nestedDestructive",
-                title: "Destructive Action",
-                attributes: {
-                  destructive: true,
-                },
-                image: Platform.select({
-                  ios: "trash",
-                  android: "ic_menu_delete",
-                }),
-              },
-            ],
-          },
-          {
-            id: "share",
-            title: "Share Action",
-            titleColor: "#46F289",
-            subtitle: "Share action on SNS",
-            image: Platform.select({
-              ios: "square.and.arrow.up",
-              android: "ic_menu_share",
-            }),
-            imageColor: "#46F289",
-            state: "on",
-          },
-        ]}
-        shouldOpenOnLongPress={false}
-      >
-        <View>
-          <Text>Menu</Text>
-        </View>
-      </MenuView>
+        setPOI={(show) => setShowPOI(show)}
+        currentPOI={showPOI}
+      />
 
-      <AppBottomSheet
-        ref={bottomSheetRef}
-        showCloseButton={false}
-        canDragToClose={false}
-      >
+      <AppBottomSheet ref={bottomSheetRef} showCloseButton={false} canDragToClose={false}>
         <LocationsSheetBody />
       </AppBottomSheet>
 
-      <AppBottomSheet
-        ref={profileSheetRef}
-        initialPosition={-1}
-        snapPoints={["50%", "90%"]}
-      >
+      <AppBottomSheet ref={profileSheetRef} initialPosition={-1} snapPoints={['50%', '90%']}>
         <ProfileSheetBody />
       </AppBottomSheet>
     </View>
@@ -150,55 +89,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   map: {
-    width: "100%",
-    height: "100%",
-  },
-  mapMenuButtonContainer: {
-    position: "absolute",
-    top: 40,
-    right: 10,
-    alignItems: "center",
-  },
-  materialBackground: {
-    width: 60,
-    height: 120,
-    borderRadius: 30,
-    overflow: "hidden",
-    elevation: 5,
-  },
-  mapMenuButtonTop: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  mapMenuButtonBottom: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  divider: {
-    width: "100%",
-    height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-  },
-  menu: {
-    position: "absolute",
-    top: 180,
-    right: 10,
-    backgroundColor: "#333",
-    borderRadius: 10,
-    padding: 10,
-    elevation: 5,
-  },
-  menuItem: {
-    padding: 10,
-  },
-  menuText: {
-    color: "white",
-    fontSize: 16,
+    width: '100%',
+    height: '100%',
   },
 });

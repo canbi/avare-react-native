@@ -1,19 +1,19 @@
 {
-    "window.zoomLevel": 0,
-    "editor.fontSize": 16,
-    "editor.rulers": [
-        150
-    ],
-    "editor.autoClosingBrackets": "always",
-    "editor.autoClosingQuotes": "always",
-    "explorer.compactFolders": false,
-    "editor.minimap.enabled": false,
-    "workbench.tree.indent": 20,
-    "workbench.tree.renderIndentGuides": "always",
-    "workbench.colorCustomizations": {
-        "tree.indentGuidesStroke": "#008070"
-    },
-    "debug.toolBarLocation": "commandCenter",
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "window.zoomLevel": 0,
+  "editor.fontSize": 16,
+  "editor.rulers": [120],
+  "editor.autoClosingBrackets": "always",
+  "editor.autoClosingQuotes": "always",
+  "explorer.compactFolders": false,
+  "editor.minimap.enabled": false,
+  "workbench.tree.indent": 20,
+  "workbench.tree.renderIndentGuides": "always",
+  "workbench.colorCustomizations": {
+    "tree.indentGuidesStroke": "#008070"
+  },
+  "debug.toolBarLocation": "commandCenter",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 120
 }
