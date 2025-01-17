@@ -1,31 +1,21 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Button,
-} from "react-native";
-import {
-  createLocationWithListsAndNotes,
-  getLocations,
-} from "@/repository/services/locationService";
-import {
-  createListWithLocations,
-  getLists,
-} from "@/repository/services/listService";
-import { Location, List, Note } from "@/repository/domain";
-import * as SQLite from "expo-sqlite";
-import { IconSymbol } from "@/components/icon/IconSymbol";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
-import LocationItem from "./locationItem";
-import ListItem from "./listItem";
-import { deleteAndRecreateDatabase } from "@/repository/database/databaseRepository";
-import debounce from "@/utils/debounce";
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button } from 'react-native';
+import { createLocationWithListsAndNotes, getLocations } from '@/repository/services/locationService';
+import { createListWithLocations, getLists } from '@/repository/services/listService';
+import { Location, List, Note } from '@/repository/domain';
+import * as SQLite from 'expo-sqlite';
+import { IconSymbol } from '@/components/icon/IconSymbol';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { useBottomSheetContext } from '@/contexts/BottomSheetContext';
+import LocationItem from './locationItem';
+import ListItem from './listItem';
+import { deleteAndRecreateDatabase } from '@/repository/database/databaseRepository';
+import debounce from '@/utils/debounce';
+import { ThemedText } from '@/components/themed/ThemedText';
+import { AppColors } from '@/constants/AppColors';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
-const LocationsSheetBody = () => {
+const MainSheetBody = () => {
   const { bottomSheetRef, profileSheetRef } = useBottomSheetContext();
   const [locations, setLocations] = useState<Location[]>([]);
   const [lists, setLists] = useState<List[]>([]);
@@ -38,7 +28,7 @@ const LocationsSheetBody = () => {
     const fetchedLocations = await getLocations();
 
     if (!fetchedLocations.isSuccess) {
-      console.error("Failed to fetch locations:", fetchedLocations.error);
+      console.error('Failed to fetch locations:', fetchedLocations.error);
       setIsRefreshingLocation(false);
       return;
     }
@@ -52,7 +42,7 @@ const LocationsSheetBody = () => {
     const fetchedLists = await getLists();
 
     if (!fetchedLists.isSuccess) {
-      console.error("Failed to fetch lists:", fetchedLists.error);
+      console.error('Failed to fetch lists:', fetchedLists.error);
       setIsRefreshingList(false);
       return;
     }
@@ -84,9 +74,9 @@ const LocationsSheetBody = () => {
   }, [isLoaded]);
 
   // DUMMY STUFF
-  const handleCreateDummyNote = async (): Promise<Omit<Note, "id">> => {
-    const note: Omit<Note, "id"> = {
-      description: "This is a dummy note",
+  const handleCreateDummyNote = async (): Promise<Omit<Note, 'id'>> => {
+    const note: Omit<Note, 'id'> = {
+      description: 'This is a dummy note',
       date: new Date().toISOString(),
       write_date: new Date().toISOString(),
     };
@@ -94,44 +84,39 @@ const LocationsSheetBody = () => {
   };
 
   const handleCreateDummyLocation = async (): Promise<Location> => {
-    const location: Omit<Location, "id"> = {
+    const location: Omit<Location, 'id'> = {
       latitude: 37.7749,
       longitude: -122.4194,
-      title: "Dummy Location",
-      description: "This is a dummy location",
-      emoji: "📍",
-      color: "#FF0000",
+      title: 'Dummy Location',
+      description: 'This is a dummy location',
+      emoji: '📍',
+      color: '#FF0000',
       is_cover_empty: false,
-      country: "USA",
-      country_code: "US",
-      local_address: "San Francisco, CA",
+      country: 'USA',
+      country_code: 'US',
+      local_address: 'San Francisco, CA',
       write_date: new Date().toISOString(),
-      photo_ids: "",
+      photo_ids: '',
     };
 
-    const notes: Omit<Note, "id">[] = [];
+    const notes: Omit<Note, 'id'>[] = [];
     for (let i = 0; i < 3; i++) {
       const note = await handleCreateDummyNote();
       notes.push(note);
     }
 
-    const locationId = await createLocationWithListsAndNotes(
-      location,
-      [],
-      notes
-    );
-    if (!locationId.isSuccess)
-      throw new Error("Failed to create dummy location");
+    const locationId = await createLocationWithListsAndNotes(location, [], notes);
+    if (!locationId.isSuccess) throw new Error('Failed to create dummy location');
 
     return { ...location, id: locationId.getValue() };
   };
 
   const handleCreateDummyList = async () => {
     try {
-      const list: Omit<List, "id"> = {
-        title: "Dummy List",
-        description: "This is a dummy list",
-        emoji: "📝",
+      const list: Omit<List, 'id'> = {
+        title: 'Dummy List',
+        description: 'This is a dummy list',
+        emoji: '📝',
         write_date: new Date().toISOString(),
       };
 
@@ -142,61 +127,50 @@ const LocationsSheetBody = () => {
       }
 
       const listId = await createListWithLocations(list, locations);
-      if (!listId.isSuccess) throw new Error("Failed to create dummy list");
+      if (!listId.isSuccess) throw new Error('Failed to create dummy list');
     } catch (error) {
-      console.error("Error creating dummy list:", error);
+      console.error('Error creating dummy list:', error);
     }
   };
 
   const handleDeleteAndRecreateDatabase = async () => {
     try {
       await deleteAndRecreateDatabase();
-      console.log("Database deleted and recreated successfully");
+      console.log('Database deleted and recreated successfully');
     } catch (error) {
-      console.error("Error deleting and recreating database:", error);
+      console.error('Error deleting and recreating database:', error);
     }
   };
-
-  const renderLocationItem = ({ item }: { item: Location }) => (
-    <LocationItem key={item.id} location={item} />
-  );
-
-  const renderListItem = ({ item }: { item: List }) => (
-    <ListItem key={item.id} list={item} />
-  );
 
   return (
     <BottomSheetScrollView style={styles.contentContainer}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Main Sheet</Text>
+        <ThemedText style={styles.headerTitle}>Main Sheet</ThemedText>
         <TouchableOpacity
           onPress={() => {
             bottomSheetRef?.current?.snapToIndex(0);
             profileSheetRef?.current?.snapToIndex(1);
           }}
         >
-          <IconSymbol size={28} name="person.crop.circle.fill" color="#000" />
+          <IconSymbol size={28} name="person.crop.circle.fill" color={useThemeColor(AppColors.default.text)} />
         </TouchableOpacity>
       </View>
       <Button title="Create Dummy List" onPress={handleCreateDummyList} />
-      <Button
-        title="Delete and Recreate Database"
-        onPress={handleDeleteAndRecreateDatabase}
-      />
+      <Button title="Delete and Recreate Database" onPress={handleDeleteAndRecreateDatabase} />
 
       <View style={styles.container}>
         {/* Lists Section */}
         <View style={styles.header}>
-          <Text style={styles.title}>Lists</Text>
+          <ThemedText style={styles.title}>Lists</ThemedText>
           <TouchableOpacity onPress={fetchLists} disabled={isRefreshingList}>
-            <Text style={styles.reloadButton}>
-              {isRefreshingList ? "Refreshing..." : "Reload"}
-            </Text>
+            <Text style={styles.reloadButton}>{isRefreshingList ? 'Refreshing...' : 'Reload'}</Text>
           </TouchableOpacity>
         </View>
         <FlatList
           data={lists}
-          renderItem={renderListItem}
+          renderItem={({ item }: { item: List }) => {
+            return <ListItem key={item.id} list={item} />;
+          }}
           keyExtractor={(item) => item.id!.toString()}
           scrollEnabled={false}
         />
@@ -205,19 +179,16 @@ const LocationsSheetBody = () => {
 
         {/* Locations Section */}
         <View style={styles.header}>
-          <Text style={styles.title}>Locations</Text>
-          <TouchableOpacity
-            onPress={fetchLocations}
-            disabled={isRefreshingLocation}
-          >
-            <Text style={styles.reloadButton}>
-              {isRefreshingLocation ? "Refreshing..." : "Reload"}
-            </Text>
+          <ThemedText style={styles.title}>Locations</ThemedText>
+          <TouchableOpacity onPress={fetchLocations} disabled={isRefreshingLocation}>
+            <Text style={styles.reloadButton}>{isRefreshingLocation ? 'Refreshing...' : 'Reload'}</Text>
           </TouchableOpacity>
         </View>
         <FlatList
           data={locations}
-          renderItem={renderLocationItem}
+          renderItem={({ item }: { item: Location }) => {
+            return <LocationItem key={item.id} location={item} />;
+          }}
           keyExtractor={(item) => item.id!.toString()}
           scrollEnabled={false}
         />
@@ -236,23 +207,23 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   title: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   reloadButton: {
-    color: "#007AFF",
+    color: '#007AFF',
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   locationItem: {
     fontSize: 16,
@@ -260,4 +231,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationsSheetBody;
+export default MainSheetBody;

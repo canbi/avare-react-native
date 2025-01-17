@@ -1,11 +1,11 @@
-import * as SQLite from "expo-sqlite";
-import * as FileSystem from "expo-file-system";
+import * as SQLite from 'expo-sqlite';
+import * as FileSystem from 'expo-file-system';
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 
 const getDatabase = async (): Promise<SQLite.SQLiteDatabase> => {
   if (!dbInstance) {
-    dbInstance = await SQLite.openDatabaseAsync("avare.db", {
+    dbInstance = await SQLite.openDatabaseAsync('avare.db', {
       enableChangeListener: true,
     });
   }
@@ -75,7 +75,7 @@ const initDatabase = async (): Promise<void> => {
     CREATE INDEX IF NOT EXISTS idx_list_location_location_id ON list_location (location_id);
   `);
 
-  console.log("Database initialized successfully");
+  console.log('Database initialized successfully');
 };
 
 const closeDatabase = async (): Promise<void> => {
@@ -94,13 +94,13 @@ const deleteAndRecreateDatabase = async (): Promise<void> => {
     const fileInfo = await FileSystem.getInfoAsync(dbFilePath);
     if (fileInfo.exists) {
       await FileSystem.deleteAsync(dbFilePath);
-      console.log("Database file deleted successfully");
+      console.log('Database file deleted successfully');
     }
 
     await initDatabase();
-    console.log("Database recreated successfully");
+    console.log('Database recreated successfully');
   } catch (error) {
-    console.error("Error deleting and recreating database:", error);
+    console.error('Error deleting and recreating database:', error);
   }
 };
 

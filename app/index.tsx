@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import AppBottomSheet from '@/components/sheet/AppBottomSheet';
-import LocationsSheetBody from '@/views/location-sheet';
+import MainSheetBody from '@/views/main-sheet';
 import { useBottomSheetContext } from '@/contexts/BottomSheetContext';
 import ProfileSheetBody from '@/views/profile-sheet';
 import MapView, { MapType, Marker } from 'react-native-maps';
@@ -76,7 +76,7 @@ export default function HomeScreen() {
       />
 
       <AppBottomSheet ref={bottomSheetRef} showCloseButton={false} canDragToClose={false}>
-        <LocationsSheetBody />
+        <MainSheetBody />
       </AppBottomSheet>
 
       <AppBottomSheet ref={profileSheetRef} initialPosition={-1} snapPoints={['50%', '90%']}>

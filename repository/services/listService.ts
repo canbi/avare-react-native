@@ -1,14 +1,14 @@
-import APIResult from "@/utils/apiResult";
-import { getDatabase } from "../database/databaseRepository";
-import { List } from "../domain/list";
-import { Location } from "../domain/location";
-import * as SQLite from "expo-sqlite";
+import APIResult from '@/utils/apiResult';
+import { getDatabase } from '../database/databaseRepository';
+import { List } from '../domain/list';
+import { Location } from '../domain/location';
+import * as SQLite from 'expo-sqlite';
 
 // * CRUD
 const getLists = async (): Promise<APIResult<List[]>> => {
   try {
     const db = await getDatabase();
-    const lists = await db.getAllAsync<List>("SELECT * FROM list");
+    const lists = await db.getAllAsync<List>('SELECT * FROM list');
 
     return APIResult.success(lists!);
   } catch (error) {
@@ -19,10 +19,7 @@ const getLists = async (): Promise<APIResult<List[]>> => {
 const getListById = async (id: number): Promise<APIResult<List | null>> => {
   try {
     const db = await getDatabase();
-    const list = await db.getFirstAsync<List>(
-      "SELECT * FROM list WHERE id = ?",
-      id
-    );
+    const list = await db.getFirstAsync<List>('SELECT * FROM list WHERE id = ?', id);
 
     return APIResult.success(list || null);
   } catch (error) {
@@ -30,12 +27,10 @@ const getListById = async (id: number): Promise<APIResult<List | null>> => {
   }
 };
 
-const _createList = async (
-  list: Omit<List, "id">
-): Promise<SQLite.SQLiteRunResult> => {
+const _createList = async (list: Omit<List, 'id'>): Promise<SQLite.SQLiteRunResult> => {
   const db = await getDatabase();
   const result = await db.runAsync(
-    "INSERT INTO list (title, description, emoji, write_date) VALUES (?, ?, ?, ?)",
+    'INSERT INTO list (title, description, emoji, write_date) VALUES (?, ?, ?, ?)',
     list.title,
     list.description ?? null,
     list.emoji,
@@ -44,13 +39,10 @@ const _createList = async (
   return result;
 };
 
-const _updateList = async (
-  id: number,
-  list: List
-): Promise<SQLite.SQLiteRunResult> => {
+const _updateList = async (id: number, list: List): Promise<SQLite.SQLiteRunResult> => {
   const db = await getDatabase();
   const result = await db.runAsync(
-    "UPDATE list SET title = ?, description = ?, emoji = ?, write_date = ? WHERE id = ?",
+    'UPDATE list SET title = ?, description = ?, emoji = ?, write_date = ? WHERE id = ?',
     list.title,
     list.description ?? null,
     list.emoji,
@@ -60,12 +52,10 @@ const _updateList = async (
   return result;
 };
 
-const deleteList = async (
-  id: number
-): Promise<APIResult<SQLite.SQLiteRunResult>> => {
+const deleteList = async (id: number): Promise<APIResult<SQLite.SQLiteRunResult>> => {
   try {
     const db = await getDatabase();
-    const result = await db.runAsync("DELETE FROM list WHERE id = ?", id);
+    const result = await db.runAsync('DELETE FROM list WHERE id = ?', id);
     return APIResult.success(result);
   } catch (error) {
     return APIResult.failure<SQLite.SQLiteRunResult>(error);
@@ -73,18 +63,11 @@ const deleteList = async (
 };
 
 // * Locations
-const _addLocationsToList = async (
-  listId: number,
-  locationIds: number[]
-): Promise<void> => {
+const _addLocationsToList = async (listId: number, locationIds: number[]): Promise<void> => {
   const db = await getDatabase();
 
   const promises = locationIds.map((locationId) =>
-    db.runAsync(
-      "INSERT INTO list_location (list_id, location_id) VALUES (?, ?)",
-      listId,
-      locationId
-    )
+    db.runAsync('INSERT INTO list_location (list_id, location_id) VALUES (?, ?)', listId, locationId)
   );
   await Promise.all(promises);
 };
@@ -92,12 +75,10 @@ const _addLocationsToList = async (
 const _removeAllLocationsFromList = async (listId: number): Promise<void> => {
   const db = await getDatabase();
 
-  await db.runAsync("DELETE FROM list_location WHERE list_id = ?", listId);
+  await db.runAsync('DELETE FROM list_location WHERE list_id = ?', listId);
 };
 
-const getLocationsForList = async (
-  listId: number
-): Promise<APIResult<Location[]>> => {
+const getLocationsForList = async (listId: number): Promise<APIResult<Location[]>> => {
   try {
     const db = await getDatabase();
     const locations = await db.getAllAsync<Location>(
@@ -115,10 +96,7 @@ const getLocationsForList = async (
 };
 
 // * High level operations
-const createListWithLocations = async (
-  list: Omit<List, "id">,
-  locationIds: number[]
-): Promise<APIResult<number>> => {
+const createListWithLocations = async (list: Omit<List, 'id'>, locationIds: number[]): Promise<APIResult<number>> => {
   try {
     const db = await getDatabase();
 
@@ -138,7 +116,7 @@ const createListWithLocations = async (
 
 const updateListWithLocations = async (
   listId: number,
-  list: Omit<List, "id">,
+  list: Omit<List, 'id'>,
   locationIds: number[]
 ): Promise<APIResult<void>> => {
   try {
@@ -158,11 +136,4 @@ const updateListWithLocations = async (
   }
 };
 
-export {
-  getLists,
-  getListById,
-  deleteList,
-  getLocationsForList,
-  createListWithLocations,
-  updateListWithLocations,
-};
+export { getLists, getListById, deleteList, getLocationsForList, createListWithLocations, updateListWithLocations };
