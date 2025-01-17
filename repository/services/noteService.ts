@@ -1,24 +1,33 @@
+import APIResult from "@/utils/apiResult";
 import { getDatabase } from "../database/databaseRepository";
 import { Note } from "../domain/note";
 import * as SQLite from "expo-sqlite";
 
 // * CRUD
-const getNotes = async (): Promise<Note[]> => {
-  const db = await getDatabase();
-  const notes = await db.getAllAsync<Note>("SELECT * FROM note");
-  return notes;
+const getNotes = async (): Promise<APIResult<Note[]>> => {
+  try {
+    const db = await getDatabase();
+    const notes = await db.getAllAsync<Note>("SELECT * FROM note");
+    return APIResult.success(notes);
+  } catch (error) {
+    return APIResult.failure<Note[]>(error);
+  }
 };
 
-const getNoteById = async (id: number): Promise<Note | null> => {
-  const db = await getDatabase();
-  const note = await db.getFirstAsync<Note>(
-    "SELECT * FROM note WHERE id = ?",
-    id
-  );
-  return note || null;
+const getNoteById = async (id: number): Promise<APIResult<Note | null>> => {
+  try {
+    const db = await getDatabase();
+    const note = await db.getFirstAsync<Note>(
+      "SELECT * FROM note WHERE id = ?",
+      id
+    );
+    return APIResult.success(note || null);
+  } catch (error) {
+    return APIResult.failure<Note | null>(error);
+  }
 };
 
-const createNote = async (
+const _createNote = async (
   note: Omit<Note, "id">,
   location_id: number
 ): Promise<SQLite.SQLiteRunResult> => {
@@ -34,7 +43,7 @@ const createNote = async (
   return result;
 };
 
-const deleteNote = async (id: number): Promise<SQLite.SQLiteRunResult> => {
+const _deleteNote = async (id: number): Promise<SQLite.SQLiteRunResult> => {
   const db = await getDatabase();
   const result = await db.runAsync("DELETE FROM note WHERE id = ?", id);
   return result;
@@ -45,7 +54,7 @@ const addNotesToLocation = async (
   locationId: number,
   notes: Omit<Note, "id">[]
 ): Promise<void> => {
-  const promises = notes.map((note) => createNote(note, locationId));
+  const promises = notes.map((note) => _createNote(note, locationId));
   await Promise.all(promises);
 };
 
@@ -72,7 +81,7 @@ const getNotesForLocation = async (locationId: number): Promise<Note[]> => {
 export {
   getNotes,
   getNoteById,
-  deleteNote,
+  _deleteNote as deleteNote,
   addNotesToLocation,
   removeAllNotesFromLocation,
   getNotesForLocation,

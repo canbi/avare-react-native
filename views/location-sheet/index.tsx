@@ -23,35 +23,42 @@ import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
 import LocationItem from "./locationItem";
 import ListItem from "./listItem";
 import { deleteAndRecreateDatabase } from "@/repository/database/databaseRepository";
+import debounce from "@/utils/debounce";
 
 const LocationsSheetBody = () => {
   const { bottomSheetRef, profileSheetRef } = useBottomSheetContext();
   const [locations, setLocations] = useState<Location[]>([]);
   const [lists, setLists] = useState<List[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isRefreshingList, setIsRefreshingList] = useState(false);
+  const [isRefreshingLocation, setIsRefreshingLocation] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const fetchLocations = async () => {
-    setIsRefreshing(true);
-    try {
-      const fetchedLocations = await getLocations();
-      setLocations(fetchedLocations);
-    } catch (error) {
-      console.error("Failed to fetch locations:", error);
-    } finally {
-      setIsRefreshing(false);
+    setIsRefreshingLocation(true);
+    const fetchedLocations = await getLocations();
+
+    if (!fetchedLocations.isSuccess) {
+      console.error("Failed to fetch locations:", fetchedLocations.error);
+      setIsRefreshingLocation(false);
+      return;
     }
+
+    setLocations(fetchedLocations.getValue());
+    setIsRefreshingLocation(false);
   };
 
   const fetchLists = async () => {
-    setIsRefreshing(true);
-    try {
-      const fetchedLists = await getLists();
-      setLists(fetchedLists);
-    } catch (error) {
-      console.error("Failed to fetch lists:", error);
-    } finally {
-      setIsRefreshing(false);
+    setIsRefreshingList(true);
+    const fetchedLists = await getLists();
+
+    if (!fetchedLists.isSuccess) {
+      console.error("Failed to fetch lists:", fetchedLists.error);
+      setIsRefreshingList(false);
+      return;
     }
+
+    setLists(fetchedLists.getValue());
+    setIsRefreshingList(false);
   };
 
   useEffect(() => {
@@ -60,17 +67,21 @@ const LocationsSheetBody = () => {
       await fetchLists();
 
       const subscription = SQLite.addDatabaseChangeListener(() => {
-        fetchLocations();
-        fetchLists();
+        const debouncedFetch = debounce(() => {
+          fetchLocations();
+          fetchLists();
+        }, 300);
+        debouncedFetch();
       });
 
+      setIsLoaded(true);
       return () => {
         subscription.remove();
       };
     };
 
-    initialize();
-  }, []);
+    if (!isLoaded) initialize();
+  }, [isLoaded]);
 
   // DUMMY STUFF
   const handleCreateDummyNote = async (): Promise<Omit<Note, "id">> => {
@@ -109,7 +120,10 @@ const LocationsSheetBody = () => {
       [],
       notes
     );
-    return { ...location, id: locationId };
+    if (!locationId.isSuccess)
+      throw new Error("Failed to create dummy location");
+
+    return { ...location, id: locationId.getValue() };
   };
 
   const handleCreateDummyList = async () => {
@@ -127,8 +141,8 @@ const LocationsSheetBody = () => {
         locations.push(location.id!);
       }
 
-      await createListWithLocations(list, locations);
-      console.log("Dummy list, locations, and notes created successfully!");
+      const listId = await createListWithLocations(list, locations);
+      if (!listId.isSuccess) throw new Error("Failed to create dummy list");
     } catch (error) {
       console.error("Error creating dummy list:", error);
     }
@@ -174,9 +188,9 @@ const LocationsSheetBody = () => {
         {/* Lists Section */}
         <View style={styles.header}>
           <Text style={styles.title}>Lists</Text>
-          <TouchableOpacity onPress={fetchLists} disabled={isRefreshing}>
+          <TouchableOpacity onPress={fetchLists} disabled={isRefreshingList}>
             <Text style={styles.reloadButton}>
-              {isRefreshing ? "Refreshing..." : "Reload"}
+              {isRefreshingList ? "Refreshing..." : "Reload"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -192,9 +206,12 @@ const LocationsSheetBody = () => {
         {/* Locations Section */}
         <View style={styles.header}>
           <Text style={styles.title}>Locations</Text>
-          <TouchableOpacity onPress={fetchLocations} disabled={isRefreshing}>
+          <TouchableOpacity
+            onPress={fetchLocations}
+            disabled={isRefreshingLocation}
+          >
             <Text style={styles.reloadButton}>
-              {isRefreshing ? "Refreshing..." : "Reload"}
+              {isRefreshingLocation ? "Refreshing..." : "Reload"}
             </Text>
           </TouchableOpacity>
         </View>

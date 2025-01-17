@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Platform,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import { View, StyleSheet, Platform, Text } from "react-native";
 import AppBottomSheet from "@/components/sheet/AppBottomSheet";
 import LocationsSheetBody from "@/views/location-sheet";
 import { useBottomSheetContext } from "@/contexts/BottomSheetContext";
@@ -17,7 +11,6 @@ import { MenuView } from "@react-native-menu/menu";
 export default function HomeScreen() {
   const { bottomSheetRef, profileSheetRef } = useBottomSheetContext();
   const [mapType, setMapType] = useState<MapType>("standard");
-  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -73,26 +66,6 @@ export default function HomeScreen() {
         ))}
       </MapView>
 
-      {/* <View style={styles.mapMenuButtonContainer}>
-        <BlurView style={styles.materialBackground} intensity={60}>
-          <TouchableOpacity
-            style={styles.mapMenuButtonTop}
-            onPress={() => setShowMenu(!showMenu)}
-          >
-            <MaterialIcons name="map" size={24} color="white" />
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity
-            style={styles.mapMenuButtonBottom}
-            onPress={() => setShowMenu(!showMenu)}
-          >
-            <MaterialIcons name="map" size={24} color="white" />
-          </TouchableOpacity>
-        </BlurView>
-      </View> */}
-
       <MenuView
         style={styles.menu}
         title="Menu Title"
@@ -100,6 +73,41 @@ export default function HomeScreen() {
           console.warn(JSON.stringify(nativeEvent));
         }}
         actions={[
+          {
+            id: "add",
+            title: "Add",
+            titleColor: "#2367A2",
+            image: Platform.select({
+              ios: "plus",
+              android: "ic_menu_add",
+            }),
+            imageColor: "#2367A2",
+            subactions: [
+              {
+                id: "nested1",
+                title: "Nested action",
+                titleColor: "rgba(250,180,100,0.5)",
+                subtitle: "State is mixed",
+                image: Platform.select({
+                  ios: "heart.fill",
+                  android: "ic_menu_today",
+                }),
+                imageColor: "rgba(100,200,250,0.3)",
+                state: "mixed",
+              },
+              {
+                id: "nestedDestructive",
+                title: "Destructive Action",
+                attributes: {
+                  destructive: true,
+                },
+                image: Platform.select({
+                  ios: "trash",
+                  android: "ic_menu_delete",
+                }),
+              },
+            ],
+          },
           {
             id: "share",
             title: "Share Action",
@@ -116,32 +124,9 @@ export default function HomeScreen() {
         shouldOpenOnLongPress={false}
       >
         <View>
-          <Text>Menu Contentasdasdasdasdasda</Text>
+          <Text>Menu</Text>
         </View>
       </MenuView>
-
-      {/* {showMenu && (
-        <View style={styles.menu}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => handleMapTypeChange("standard")}
-          >
-            <Text style={styles.menuText}>Standard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => handleMapTypeChange("satellite")}
-          >
-            <Text style={styles.menuText}>Satellite</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => handleMapTypeChange("hybrid")}
-          >
-            <Text style={styles.menuText}>Hybrid</Text>
-          </TouchableOpacity>
-        </View>
-      )} */}
 
       <AppBottomSheet
         ref={bottomSheetRef}

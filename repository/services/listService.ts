@@ -1,25 +1,36 @@
+import APIResult from "@/utils/apiResult";
 import { getDatabase } from "../database/databaseRepository";
 import { List } from "../domain/list";
 import { Location } from "../domain/location";
 import * as SQLite from "expo-sqlite";
 
 // * CRUD
-const getLists = async (): Promise<List[]> => {
-  const db = await getDatabase();
-  const lists = await db.getAllAsync<List>("SELECT * FROM list");
-  return lists;
+const getLists = async (): Promise<APIResult<List[]>> => {
+  try {
+    const db = await getDatabase();
+    const lists = await db.getAllAsync<List>("SELECT * FROM list");
+
+    return APIResult.success(lists!);
+  } catch (error) {
+    return APIResult.failure<List[]>(error);
+  }
 };
 
-const getListById = async (id: number): Promise<List | null> => {
-  const db = await getDatabase();
-  const list = await db.getFirstAsync<List>(
-    "SELECT * FROM list WHERE id = ?",
-    id
-  );
-  return list || null;
+const getListById = async (id: number): Promise<APIResult<List | null>> => {
+  try {
+    const db = await getDatabase();
+    const list = await db.getFirstAsync<List>(
+      "SELECT * FROM list WHERE id = ?",
+      id
+    );
+
+    return APIResult.success(list || null);
+  } catch (error) {
+    return APIResult.failure<List | null>(error);
+  }
 };
 
-const createList = async (
+const _createList = async (
   list: Omit<List, "id">
 ): Promise<SQLite.SQLiteRunResult> => {
   const db = await getDatabase();
@@ -33,7 +44,7 @@ const createList = async (
   return result;
 };
 
-const updateList = async (
+const _updateList = async (
   id: number,
   list: List
 ): Promise<SQLite.SQLiteRunResult> => {
@@ -49,48 +60,20 @@ const updateList = async (
   return result;
 };
 
-const deleteList = async (id: number): Promise<SQLite.SQLiteRunResult> => {
-  const db = await getDatabase();
-  const result = await db.runAsync("DELETE FROM list WHERE id = ?", id);
-  return result;
-};
-
-// * High level operations
-const createListWithLocations = async (
-  list: Omit<List, "id">,
-  locationIds: number[]
-): Promise<number> => {
-  const db = await getDatabase();
-
-  let listId: number;
-
-  await db.withTransactionAsync(async () => {
-    const createListResult = await createList(list);
-    listId = createListResult.lastInsertRowId as number;
-    await addLocationsToList(listId, locationIds);
-  });
-
-  return listId!;
-};
-
-const updateListWithLocations = async (
-  listId: number,
-  list: Omit<List, "id">,
-  locationIds: number[]
-): Promise<void> => {
-  const db = await getDatabase();
-
-  await db.withTransactionAsync(async () => {
-    await updateList(listId, list);
-    await removeAllLocationsFromList(listId);
-    if (locationIds.length > 0) {
-      await addLocationsToList(listId, locationIds);
-    }
-  });
+const deleteList = async (
+  id: number
+): Promise<APIResult<SQLite.SQLiteRunResult>> => {
+  try {
+    const db = await getDatabase();
+    const result = await db.runAsync("DELETE FROM list WHERE id = ?", id);
+    return APIResult.success(result);
+  } catch (error) {
+    return APIResult.failure<SQLite.SQLiteRunResult>(error);
+  }
 };
 
 // * Locations
-const addLocationsToList = async (
+const _addLocationsToList = async (
   listId: number,
   locationIds: number[]
 ): Promise<void> => {
@@ -106,23 +89,73 @@ const addLocationsToList = async (
   await Promise.all(promises);
 };
 
-const removeAllLocationsFromList = async (listId: number): Promise<void> => {
+const _removeAllLocationsFromList = async (listId: number): Promise<void> => {
   const db = await getDatabase();
 
   await db.runAsync("DELETE FROM list_location WHERE list_id = ?", listId);
 };
 
-const getLocationsForList = async (listId: number): Promise<Location[]> => {
-  const db = await getDatabase();
-  const locations = await db.getAllAsync<Location>(
-    `
-    SELECT location.* FROM location
-    INNER JOIN list_location ON location.id = list_location.location_id
-    WHERE list_location.list_id = ?
-  `,
-    listId
-  );
-  return locations;
+const getLocationsForList = async (
+  listId: number
+): Promise<APIResult<Location[]>> => {
+  try {
+    const db = await getDatabase();
+    const locations = await db.getAllAsync<Location>(
+      `
+        SELECT location.* FROM location
+        INNER JOIN list_location ON location.id = list_location.location_id
+        WHERE list_location.list_id = ?
+      `,
+      listId
+    );
+    return APIResult.success(locations);
+  } catch (error) {
+    return APIResult.failure<Location[]>(error);
+  }
+};
+
+// * High level operations
+const createListWithLocations = async (
+  list: Omit<List, "id">,
+  locationIds: number[]
+): Promise<APIResult<number>> => {
+  try {
+    const db = await getDatabase();
+
+    let listId: number;
+
+    await db.withTransactionAsync(async () => {
+      const createListResult = await _createList(list);
+      listId = createListResult.lastInsertRowId as number;
+      await _addLocationsToList(listId, locationIds);
+    });
+
+    return APIResult.success(listId!);
+  } catch (error) {
+    return APIResult.failure<number>(error);
+  }
+};
+
+const updateListWithLocations = async (
+  listId: number,
+  list: Omit<List, "id">,
+  locationIds: number[]
+): Promise<APIResult<void>> => {
+  try {
+    const db = await getDatabase();
+
+    await db.withTransactionAsync(async () => {
+      await _updateList(listId, list);
+      await _removeAllLocationsFromList(listId);
+      if (locationIds.length > 0) {
+        await _addLocationsToList(listId, locationIds);
+      }
+    });
+
+    return APIResult.success();
+  } catch (error) {
+    return APIResult.failure<void>(error);
+  }
 };
 
 export {
