@@ -37,5 +37,9 @@ export const AppColors = {
       light: `#ffffff${Opacity.opacity95}`,
       dark: `#353935${Opacity.opacity95}`,
     },
+    divider: {
+      light: `#E5E7E9${Opacity.opacity95}`,
+      dark: `#566573${Opacity.opacity95}`,
+    },
   },
 };

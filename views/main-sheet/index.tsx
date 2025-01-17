@@ -149,7 +149,7 @@ const MainSheetBody = () => {
         <TouchableOpacity
           onPress={() => {
             bottomSheetRef?.current?.snapToIndex(0);
-            profileSheetRef?.current?.snapToIndex(1);
+            profileSheetRef?.current?.snapToIndex(0);
           }}
         >
           <IconSymbol size={28} name="person.crop.circle.fill" color={useThemeColor(AppColors.default.text)} />
