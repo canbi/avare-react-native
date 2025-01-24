@@ -6,13 +6,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AppAssets } from '@/constants/AppAssets';
+import { AppAssets } from '@/utils/AppAssets';
 import i18n from '@/i18n/i18n';
-import { useColorScheme } from '@/hooks/useColorSchema/useColorScheme';
+import { useColorScheme } from '@/utils/useColorSchema/useColorScheme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { initDatabase } from '@/repository/database/databaseRepository';
-import { BottomSheetProvider } from '@/contexts/BottomSheetContext';
+import { initDatabase } from '@/presentation/_infrastructure/DatabaseRepository';
+import { BottomSheetProvider } from '@/presentation/_logic/BottomSheetContext';
 import * as Location from 'expo-location';
 
 SplashScreen.preventAutoHideAsync();
